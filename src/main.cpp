@@ -1,8 +1,9 @@
 #include <Geode/Geode.hpp>
+#include <Geode/modify/MenuLayer.hpp>
+#include "openurl/searchtab.h"
 
 using namespace geode::prelude;
 
-#include <Geode/modify/MenuLayer.hpp>
 class $modify(MyMenuLayer, MenuLayer) {
 	bool init() {
 
@@ -27,10 +28,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 	}
 
 	void onMyButton(CCObject*) {
-		auto searchObj = GJSearchObject::create(SearchType::Search, std::to_string(90475473));
-
-
-		auto scene = LevelBrowserLayer::scene(searchObj);
-		CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, scene));
+		gdloader::searchtab("90475473");
 	}
 };
