@@ -12,6 +12,9 @@ void gdloader::searchtab(const gd::string& searchQuery) {
 void gdloader::loadlevel(const int& levelID) {
     auto level = GJGameLevel::create();
     level->m_levelID = levelID;
+    level->m_creatorName = "Cubekii";
+    level->m_levelName = "It's my level";
+    level->m_dislikes = 999999;
 
     auto scene = LevelInfoLayer::scene(level, false);
     CCDirector::sharedDirector()->pushScene(
