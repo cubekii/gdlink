@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <string>
 #include <Geode/modify/MenuLayer.hpp>
+#include "../../src/openurl/searchtab.h"
 
 const auto executionPath = (geode::prelude::dirs::getGameDir() / "GeometryDash.exe").string();
 
@@ -48,4 +49,39 @@ std::string CustomUrl::GetLink() {
             pendingUrl->pop_back();
     }
     return pendingUrl->c_str();
+}
+
+void CustomUrl::Redirect() {
+    std::string url = GetLink();
+    const std::string scheme = "gdlink://";
+
+    // Проверяем схему
+    if (url.rfind(scheme, 0) != 0) {
+        std::cout << "Invalid scheme\n";
+        return;
+    }
+
+    // Убираем "gdlink://"
+    std::string path = url.substr(scheme.length());
+
+    // Убираем query (всё после '?')
+    size_t queryPos = path.find('?');
+    if (queryPos != std::string::npos) {
+        path = path.substr(0, queryPos);
+    }
+
+    // Теперь path = "level/90475473"
+    std::cout << "Path: " << path << std::endl;
+
+    // Разбиваем путь
+    size_t slashPos = path.find('/');
+    if (slashPos != std::string::npos) {
+        std::string action = path.substr(0, slashPos);
+        std::string id = path.substr(slashPos + 1);
+
+
+        if (action == "level") {
+            gdloader::loadlevel(std::stoi(id));
+        }
+    }
 }
