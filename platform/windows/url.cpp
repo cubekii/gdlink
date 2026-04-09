@@ -5,7 +5,7 @@
 
 const auto executionPath = (geode::prelude::dirs::getGameDir() / "GeometryDash.exe").string();
 
-CustomUrl::CustomUrl(const std::string& scheme, const std::string& exePath = executionPath) {
+CustomUrl::CustomUrl(const std::string& scheme) {
     std::string baseKey = "SOFTWARE\\Classes\\" + scheme;
 
     // Create root key
@@ -25,7 +25,7 @@ CustomUrl::CustomUrl(const std::string& scheme, const std::string& exePath = exe
     RegCreateKeyExA(HKEY_CURRENT_USER, cmdKey.c_str(), 0, NULL,
         REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
 
-    std::string cmd = "\"" + exePath + "\" \"%1\"";
+    std::string cmd = "\"" + executionPath + "\" \"%1\"";
     RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)cmd.c_str(), cmd.size() + 1);
     RegCloseKey(hKey);
 }
