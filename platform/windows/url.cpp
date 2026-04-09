@@ -34,3 +34,18 @@ CustomUrl::~CustomUrl() {}
 void CustomUrl::sendNotification(const char* title, const char* text) {
 
 }
+
+std::string CustomUrl::GetLink() {
+
+    std::optional<std::string> pendingUrl = std::nullopt;
+    std::string cmdLine = GetCommandLineA();
+
+    size_t pos = cmdLine.find("gdlink://");
+    if (pos != std::string::npos) {
+        pendingUrl = cmdLine.substr(pos);
+
+        if (!pendingUrl->empty() && pendingUrl->back() == '"')
+            pendingUrl->pop_back();
+    }
+    return pendingUrl->c_str();
+}
