@@ -8,3 +8,13 @@ void gdloader::searchtab(const gd::string& searchQuery) {
     auto scene = LevelBrowserLayer::scene(searchObj);
     CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, scene));
 }
+
+void gdloader::loadlevel(const int& levelID) {
+    auto level = GJGameLevel::create();
+    level->m_levelID = levelID;
+
+    auto scene = LevelInfoLayer::scene(level, false);
+    CCDirector::sharedDirector()->pushScene(
+        CCTransitionFade::create(0.5f, scene)
+    );
+}

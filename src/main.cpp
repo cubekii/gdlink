@@ -39,7 +39,8 @@ class $modify(MyMenuLayer, MenuLayer) {
 
 	void onMyButton(CCObject*) {
 		//gdloader::searchtab("90475473");
-		CustomUrl example("gdlink",exePath.string());
-		example.sendNotification("example","notification");
+		//CustomUrl example("gdlink",exePath.string());
+		//example.sendNotification("example","notification");
+		gdloader::loadlevel(90475473);
 	}
 };
