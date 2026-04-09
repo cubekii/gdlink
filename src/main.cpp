@@ -1,10 +1,18 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include "openurl/searchtab.h"
+#include <Geode/loader/Dirs.hpp>
 #include <url.h>
 
-
 using namespace geode::prelude;
+
+std::filesystem::path gdDir = dirs::getGameDir();
+#ifdef GEODE_IS_WINDOWS
+	auto exePath = gdDir / "GeometryDash.exe";
+#elif defined(GEODE_IS_MACOS)
+	auto exePath = gdDir; // on macOS, getGameDir() returns the .app bundle itself
+#endif
+
 
 class $modify(MyMenuLayer, MenuLayer) {
 	bool init() {
@@ -31,7 +39,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 
 	void onMyButton(CCObject*) {
 		//gdloader::searchtab("90475473");
-		Notify example;
+		CustomUrl example("gdlink",exePath.string());
 		example.sendNotification("example","notification");
 	}
 };
