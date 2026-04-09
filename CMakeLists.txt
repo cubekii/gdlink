@@ -13,9 +13,6 @@ project(Template VERSION 1.0.0)
 # Add all source files inside src (recursively)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h src/*.hpp)
 
-# Set up the mod binary
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
-
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
 else()
@@ -23,6 +20,15 @@ else()
 endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
+# Add platform-specific code as a static library
+add_subdirectory(platform)
+
+# Set up the mod binary
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+# Link platform static library to the main mod (plain signature for compatibility)
+target_link_libraries(${PROJECT_NAME} platform_lib)
 
 # Set up dependencies, resources, and link Geode.
 setup_geode_mod(${PROJECT_NAME})

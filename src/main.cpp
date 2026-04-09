@@ -1,6 +1,8 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include "openurl/searchtab.h"
+#include <url.h>
+
 
 using namespace geode::prelude;
 
@@ -28,6 +30,8 @@ class $modify(MyMenuLayer, MenuLayer) {
 	}
 
 	void onMyButton(CCObject*) {
-		gdloader::searchtab("90475473");
+		//gdloader::searchtab("90475473");
+		Notify example;
+		example.sendNotification("example","notification");
 	}
 };
