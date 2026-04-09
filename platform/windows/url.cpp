@@ -1,9 +1,11 @@
 #include <url.h>
 #include <Windows.h>
 #include <string>
+#include <Geode/modify/MenuLayer.hpp>
 
+const auto executionPath = (geode::prelude::dirs::getGameDir() / "GeometryDash.exe").string();
 
-CustomUrl::CustomUrl(const std::string& scheme, const std::string& exePath) {
+CustomUrl::CustomUrl(const std::string& scheme, const std::string& exePath = executionPath) {
     std::string baseKey = "SOFTWARE\\Classes\\" + scheme;
 
     // Create root key
