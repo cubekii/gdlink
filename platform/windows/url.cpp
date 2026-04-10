@@ -48,11 +48,17 @@ std::string CustomUrl::GetLink() {
         if (!pendingUrl->empty() && pendingUrl->back() == '"')
             pendingUrl->pop_back();
     }
-    return pendingUrl->c_str();
+    
+    if (pendingUrl.has_value()) {
+        return *pendingUrl;
+    }
+    return "";
 }
 
 void CustomUrl::Redirect() {
     std::string url = GetLink();
+    if (url.empty())
+        return;
     const std::string scheme = "gdlink://";
 
     // Проверяем схему
@@ -81,7 +87,11 @@ void CustomUrl::Redirect() {
 
 
         if (action == "level") {
-            gdloader::loadlevel(std::stoi(id));
+            try {
+                gdloader::loadlevel(std::stoi(id));
+            } catch (const std::exception& e) {
+                geode::prelude::log::warn("wrong id");
+            }
         }
     }
 }
