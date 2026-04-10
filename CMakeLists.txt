@@ -23,7 +23,7 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 # Add platform-specific code as a static library
 add_subdirectory(platform)
-add_subdirectory(libs/cpp-httplib)
+#add_subdirectory(libs/cpp-httplib)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
