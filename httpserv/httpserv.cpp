@@ -22,6 +22,10 @@ void httpserv::startserver() {
             res.set_content("{\"status\": \"ok\"}", "application/json");
         });
 
+        svr.Post("/api/echo", [](const httplib::Request& req, httplib::Response& res) {
+            res.set_content("You sent: " + req.body, "text/plain");
+        });
+
         svr.listen("0.0.0.0", 6767);
         g_running = false;
     });
