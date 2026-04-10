@@ -1,0 +1,6 @@
+{
+  "libs/cpp-httplib": {
+    "url": "https://github.com/yhirose/cpp-httplib",
+    "commit": "783de4ec4e7677e097e77eca95ea5399067a4cd6"
+  }
+}
