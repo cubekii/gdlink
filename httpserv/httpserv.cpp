@@ -1,5 +1,5 @@
 #include "httpserv.h"
-#include "../libs/cpp-httplib/httplib.h"
+#include "httplib.h"
 
 inline void httpserv::startserver() {
     httplib::Server svr;
