@@ -7,5 +7,5 @@ public:
     virtual ~CustomUrl();
     void sendNotification(const char* title, const char* text);
     static std::string GetLink();
-    static void Redirect();
+    static void Redirect(const std::string& url);
 };

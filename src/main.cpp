@@ -19,7 +19,7 @@ class $modify(LoadingLayer) {
 		if (m_loadStep >= 14) { // 14 = last step in GD 2.2
 			//gdloader::loadlevel(90475473);
 			httpserv::startserver();
-			CustomUrl::Redirect();
+			CustomUrl::Redirect( CustomUrl::GetLink() );
 		}
 	}
 };

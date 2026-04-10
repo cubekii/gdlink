@@ -1,5 +1,6 @@
 #include "httpserv.h"
 #include "httplib.h"
+#include <url.h>
 #include <thread>
 #include <atomic>
 
@@ -23,10 +24,12 @@ void httpserv::startserver() {
         });
 
         svr.Post("/api/echo", [](const httplib::Request& req, httplib::Response& res) {
-            res.set_content("You sent: " + req.body, "text/plain");
+            std::string received = req.body; // "Hello"
+            // ... do whatever with 'received' ...
+            res.set_content(received, "text/plain");
         });
 
-        svr.listen("0.0.0.0", 6767);
+        svr.listen("127.0.0.1", 6767);
         g_running = false;
     });
 
