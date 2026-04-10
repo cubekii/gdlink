@@ -4,8 +4,6 @@
 #include "openurl/searchtab.h"
 #include <Geode/loader/Dirs.hpp>
 #include <url.h>
-#include <httpserv.h>
-
 #include "../httpserv/httpserv.h"
 
 using namespace geode::prelude;
@@ -13,7 +11,7 @@ using namespace geode::prelude;
 
 $on_mod(Loaded) {
 	CustomUrl gdlink("gdlink");
-	//httpserv::startserver();
+	httpserv::startserver();
 }
 class $modify(LoadingLayer) {
 	void loadAssets() {

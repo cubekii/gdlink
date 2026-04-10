@@ -1,7 +1,7 @@
 #include "httpserv.h"
 #include "httplib.h"
 
-inline void httpserv::startserver() {
+void httpserv::startserver() {
     httplib::Server svr;
 
     svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
