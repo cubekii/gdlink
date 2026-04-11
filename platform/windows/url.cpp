@@ -55,8 +55,7 @@ std::string CustomUrl::GetLink() {
     return "";
 }
 
-void CustomUrl::Redirect() {
-    std::string url = GetLink();
+void CustomUrl::Redirect(const std::string& url) {
     if (url.empty())
         return;
     const std::string scheme = "gdlink://";
@@ -75,9 +74,6 @@ void CustomUrl::Redirect() {
     if (queryPos != std::string::npos) {
         path = path.substr(0, queryPos);
     }
-
-    // Теперь path = "level/90475473"
-    std::cout << "Path: " << path << std::endl;
 
     // Разбиваем путь
     size_t slashPos = path.find('/');

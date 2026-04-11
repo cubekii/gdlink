@@ -4,6 +4,7 @@
 #include "openurl/searchtab.h"
 #include <Geode/loader/Dirs.hpp>
 #include <url.h>
+#include "../httpserv/httpserv.h"
 
 using namespace geode::prelude;
 
@@ -17,8 +18,8 @@ class $modify(LoadingLayer) {
 
 		if (m_loadStep >= 14) { // 14 = last step in GD 2.2
 			//gdloader::loadlevel(90475473);
-
-			CustomUrl::Redirect();
+			httpserv::startserver();
+			CustomUrl::Redirect( CustomUrl::GetLink() );
 		}
 	}
 };
