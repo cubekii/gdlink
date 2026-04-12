@@ -1,6 +1,21 @@
 #include "httpclient.h"
 #include <httplib.h>
 
+httpclient::http_headers httpclient::parseResponse(const std::string& body) {
+    std::string levelSection = body.substr(0, body.find('#'));
+
+    std::string firstLevel = levelSection.substr(0, levelSection.find('|'));
+
+    std::unordered_map<std::string, std::string> fields;
+    std::istringstream stream(firstLevel);
+    std::string key, value;
+
+    while (std::getline(stream, key, ':') && std::getline(stream, value, ':')) {
+        fields[key] = value;
+    }
+    return fields;
+}
+
 void httpclient::fetch(const std::string& levelId) {
     httplib::Client cli("https://www.boomlings.com");
 
@@ -33,4 +48,5 @@ void httpclient::fetch(const std::string& levelId) {
     if (res->body == "-1") {
         return;
     }
+    auto fields = parseResponse(res->body);
 }
