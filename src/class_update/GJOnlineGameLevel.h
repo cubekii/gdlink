@@ -3,5 +3,5 @@
 
 class GJOnlineGameLevel : public GJGameLevel {
 public:
-    static GJGameLevel* GJOnlineGameLevel::create(const int& id);
+    static GJOnlineGameLevel* createWithLevelID(const int& id);
 };

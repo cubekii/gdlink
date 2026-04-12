@@ -1,8 +1,13 @@
 #include "GJOnlineGameLevel.h"
 #include <Geode/Geode.hpp>
 
-GJGameLevel* GJOnlineGameLevel::create(const int& id) {
-    auto level = GJGameLevel::create();
-    level->m_levelID = id;
-    return level;
+GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
+    auto level = new GJOnlineGameLevel();
+    if (level->init()) {
+        level->m_levelID = id;
+        level->autorelease();
+        return level;
+    }
+    CC_SAFE_DELETE(level);
+    return nullptr;
 }

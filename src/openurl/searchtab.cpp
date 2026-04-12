@@ -12,7 +12,7 @@ void gdloader::searchtab(const gd::string& searchQuery) {
 }
 
 void gdloader::loadlevel(const int& levelID) {
-    auto level = GJOnlineGameLevel::create(levelID);
+    auto level = GJOnlineGameLevel::createWithLevelID(levelID);
 
     auto scene = LevelInfoLayer::scene(level, false);
     CCDirector::sharedDirector()->pushScene(
