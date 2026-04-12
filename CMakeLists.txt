@@ -42,7 +42,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32_LEAN_AND_MEAN)
 
 # Link platform static library and httplib to the main mod (plain signature for Geode compatibility)
 target_link_libraries(${PROJECT_NAME} platform_lib httplib::httplib)
-#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 
 # Set up dependencies, resources, and link Geode.
 setup_geode_mod(${PROJECT_NAME})

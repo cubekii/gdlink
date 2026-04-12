@@ -4,7 +4,7 @@
 #include "openurl/searchtab.h"
 #include <Geode/loader/Dirs.hpp>
 #include <url.h>
-#include "../httpserv/httpserv.h"
+#include "httpserv/httpserv.h"
 
 using namespace geode::prelude;
 
