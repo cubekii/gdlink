@@ -6,7 +6,7 @@ httpclient::http_headers httpclient::parseResponse(const std::string& body) {
 
     std::string firstLevel = levelSection.substr(0, levelSection.find('|'));
 
-    std::unordered_map<std::string, std::string> fields;
+    http_headers fields;
     std::istringstream stream(firstLevel);
     std::string key, value;
 
@@ -16,7 +16,7 @@ httpclient::http_headers httpclient::parseResponse(const std::string& body) {
     return fields;
 }
 
-void httpclient::fetch(const std::string& levelId) {
+std::string httpclient::fetch(const std::string& levelId, const FieldType& field) {
     httplib::Client cli("https://www.boomlings.com");
 
     cli.set_default_headers({
@@ -37,16 +37,19 @@ void httpclient::fetch(const std::string& levelId) {
 
     auto res = cli.Post("/database/getGJLevels21.php", params);
 
-    if (!res) {
-        return;
-    }
-
-    if (res->status != 200) {
-        return;
-    }
-
-    if (res->body == "-1") {
-        return;
+    if (res->body == "-1" || !res || res->status != 200) {
+        return "-1";
     }
     auto fields = parseResponse(res->body);
+    switch (field) {
+        case LevelID:
+            return fields["1"];
+            break;
+        case LevelName:
+            return fields["2"];
+            break;
+        default:
+            return "-1";
+            break;
+    }
 }
