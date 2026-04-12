@@ -8,16 +8,11 @@
 
 using namespace geode::prelude;
 
-
-$on_mod(Loaded) {
-	CustomUrl gdlink("gdlink");
-}
 class $modify(LoadingLayer) {
 	void loadAssets() {
 		LoadingLayer::loadAssets(); // call original first
 
-		if (m_loadStep >= 14) { // 14 = last step in GD 2.2
-			//gdloader::loadlevel(90475473);
+		if (m_loadStep >= 14) {
 			httpserv::startserver();
 			CustomUrl::Redirect( CustomUrl::GetLink() );
 		}

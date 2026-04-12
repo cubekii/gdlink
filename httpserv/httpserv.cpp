@@ -4,10 +4,13 @@
 #include <thread>
 #include <atomic>
 
+#include "../src/openurl/searchtab.h"
+
 static std::atomic<bool> g_running{false};
 static std::thread g_server_thread;
 
 void httpserv::startserver() {
+    CustomUrl gdlink("gdlink");
     if (g_running.exchange(true)) {
         return; // already running
     }
@@ -25,7 +28,9 @@ void httpserv::startserver() {
 
         svr.Post("/api/echo", [](const httplib::Request& req, httplib::Response& res) {
             std::string received = req.body; // "Hello"
-            // ... do whatever with 'received' ...
+            geode::queueInMainThread([received]() mutable {
+            CustomUrl::Redirect( received );
+            });
             res.set_content(received, "text/plain");
         });
 
