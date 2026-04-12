@@ -1,6 +1,7 @@
 #include "searchtab.h"
 #include <Geode/Geode.hpp>
-#include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <src/class_update/GJOnlineGameLevel.h>
+
 using namespace cocos2d;
 
 void gdloader::searchtab(const gd::string& searchQuery) {
@@ -11,7 +12,7 @@ void gdloader::searchtab(const gd::string& searchQuery) {
 }
 
 void gdloader::loadlevel(const int& levelID) {
-    auto level = EditorIDs::getLevelByID(levelID);
+    auto level = GJOnlineGameLevel::create(levelID);
 
     auto scene = LevelInfoLayer::scene(level, false);
     CCDirector::sharedDirector()->pushScene(

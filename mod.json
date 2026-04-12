@@ -12,7 +12,6 @@
 	"developer": "Cubekii",
 	"description": "custom gd protocol for open everything",
 	"dependencies": {
-		"geode.node-ids": ">=v1.20.0",
-		"cvolton.level-id-api": ">=v2.0.0"
+		"geode.node-ids": ">=v1.20.0"
 	}
 }
