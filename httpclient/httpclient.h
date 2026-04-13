@@ -9,8 +9,8 @@
 
 namespace httpclient {
     enum FieldType {
-        LevelID,
-        LevelName,
+        LevelID = 1,
+        LevelName = 2,
         LevelDescription,
     };
 
