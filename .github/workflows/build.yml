@@ -1,0 +1,54 @@
+name: Build Geode Mod
+
+on:
+  push:
+    branches: [ main, master, dev/github-workflow ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Geode CLI
+        run: |
+          cargo install geode-cli --locked
+        shell: pwsh
+
+      - name: Setup Geode SDK
+        run: |
+          geode sdk install
+        shell: pwsh
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure CMake
+        run: |
+          $geodePath = (geode sdk path --json | ConvertFrom-Json).path
+          $env:GEODE_SDK = $geodePath
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+        shell: pwsh
+
+      - name: Build
+        run: |
+          $geodePath = (geode sdk path --json | ConvertFrom-Json).path
+          $env:GEODE_SDK = $geodePath
+          cmake --build build --config Release -j$env:NUMBER_OF_PROCESSORS
+        shell: pwsh
+
+      - name: Upload mod artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: geode-mod-windows
+          path: build/*.geode
+          if-no-files-found: warn
