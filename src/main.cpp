@@ -16,9 +16,6 @@ class $modify(LoadingLayer) {
 		if (m_loadStep >= 14) {
 			httpserv::startserver();
 			CustomUrl::Redirect( CustomUrl::GetLink() );
-			httpclient::fetch("28225110", httpclient::FieldType::LevelName);
-			std::string levelName = httpclient::get_result("28225110", httpclient::FieldType::LevelName);
-			Notification::create(levelName)->show();
 		}
 	}
 };
