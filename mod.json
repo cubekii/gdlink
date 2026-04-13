@@ -7,7 +7,7 @@
 	"name": "Geometry dash links",
 	"version": "0.0.1",
 	"developer": "Cubekii",
-	"description": "custom gd protocol for open everything",
+	"description": "custom Geometry Dash protocol for open everything",
 	"dependencies": {
 		"geode.node-ids": ">=v1.20.0"
 	}

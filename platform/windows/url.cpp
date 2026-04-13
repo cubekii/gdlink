@@ -56,33 +56,38 @@ std::string CustomUrl::GetLink() {
 }
 
 void CustomUrl::Redirect(const std::string& url) {
-    if (url.empty())
-        return;
-    const std::string scheme = "gdlink://";
+    static constexpr std::string_view SCHEME = "gdlink://GD/";
+    static constexpr std::string_view LEVEL_ACTION = "level/";
 
-    if (url.rfind(scheme, 0) != 0) {
+    if (url.size() <= SCHEME.size()) return;
+
+    std::string_view view(url);
+
+    if (view.substr(0, SCHEME.size()) != SCHEME) {
         std::cout << "Invalid scheme\n";
         return;
     }
 
-    std::string path = url.substr(scheme.length());
+    view = view.substr(SCHEME.size());
 
-    size_t queryPos = path.find('?');
-    if (queryPos != std::string::npos) {
-        path = path.substr(0, queryPos);
-    }
+    // Strip query string
+    if (auto q = view.find('?'); q != std::string_view::npos)
+        view = view.substr(0, q);
 
-    size_t slashPos = path.find('/');
-    if (slashPos != std::string::npos) {
-        std::string action = path.substr(0, slashPos);
-        std::string id = path.substr(slashPos + 1);
+    if (view.substr(0, LEVEL_ACTION.size()) != LEVEL_ACTION) return;
 
-        if (action == "level") {
-            try {
-                gdloader::loadlevel(std::stoi(id));
-            } catch (const std::exception& e) {
-                geode::prelude::log::warn("wrong id");
-            }
+    view = view.substr(LEVEL_ACTION.size());
+
+    // Parse ID without exceptions
+    int id = 0;
+    for (char c : view) {
+        if (c < '0' || c > '9') {
+            geode::prelude::log::warn("wrong id");
+            return;
         }
+        id = id * 10 + (c - '0');
     }
+
+    if (!view.empty())
+        gdloader::loadlevel(id);
 }

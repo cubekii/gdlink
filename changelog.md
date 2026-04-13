@@ -1,2 +1,3 @@
-# 1.0.0
-- Edit this file to change your mod's changelog.
+# 0.0.1 (alpha)
+- Add first platform support (windows)
+- Add custom links gdlink://GD/level/<id> for open levels from browser
