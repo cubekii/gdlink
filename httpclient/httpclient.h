@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 namespace httpclient {
     enum FieldType {
@@ -16,13 +17,12 @@ namespace httpclient {
     using http_headers = std::unordered_map<std::string, std::string>;
 
     http_headers parseResponse(const std::string& body);
-    void fetch(const std::string& id, const FieldType& field);
-    std::string get_result(const std::string& id, const FieldType& field);
 
     class BoomlingsLevel {
     private:
         std::thread gclient;
         std::mutex fields_mutex;
+        std::atomic<bool> ready{ false };  // <-- add this
         http_headers fields;
         std::string level_id;
 
