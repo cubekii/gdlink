@@ -3,9 +3,9 @@
 	"gd": {
 		"win": "2.2081"
 	},
-	"id": "gdlink",
+	"id": "cubekii.gdlink",
 	"name": "Geometry dash links",
-	"version": "0.0.1",
+	"version": "v0.0.1-alpha",
 	"developer": "Cubekii",
 	"description": "custom Geometry Dash protocol for open everything",
 	"dependencies": {
