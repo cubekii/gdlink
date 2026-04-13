@@ -16,4 +16,14 @@ namespace httpclient {
     http_headers parseResponse(const std::string& body);
     void fetch(const std::string& id, const FieldType& field);
     std::string get_result(const std::string& id, const FieldType& field);
+
+    class BoomlingsLevel {
+    private:
+        std::thread gclient;
+    public:
+        void start();
+        void fetch();
+
+    };
+
 }
