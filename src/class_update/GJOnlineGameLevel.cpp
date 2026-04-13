@@ -16,6 +16,7 @@ GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
         level->m_levelID = id;
         level->autorelease();
         level->m_levelName = Fetchlevel.get_result(httpclient::FieldType::LevelName);
+        level->m_creatorName = Fetchlevel.get_author();
         return level;
     }
     CC_SAFE_DELETE(level);
