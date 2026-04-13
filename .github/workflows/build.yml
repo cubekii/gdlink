@@ -73,9 +73,9 @@ jobs:
           name: Build Output
           path: ./output
 
-  #     - name: Publish to GitHub Releases
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         files: ./output/*.geode
-  #         tag_name: ${{ github.ref_name }}
-  #         generate_release_notes: true
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./output/*.geode
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
