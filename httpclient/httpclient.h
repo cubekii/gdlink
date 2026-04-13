@@ -3,6 +3,8 @@
 #include <httplib.h>
 #include <string>
 #include <unordered_map>
+#include <thread>
+#include <mutex>
 
 namespace httpclient {
     enum FieldType {
@@ -20,9 +22,16 @@ namespace httpclient {
     class BoomlingsLevel {
     private:
         std::thread gclient;
-        static std::unordered_map<std::string, std::string> fields;
+        std::mutex fields_mutex;
+        http_headers fields;
+        std::string level_id;
+
     public:
+        BoomlingsLevel() = default;
+        ~BoomlingsLevel();
+
         void fetch(std::string level_id);
+        bool is_ready() const;
         std::string get_result(const FieldType& field);
     };
 
