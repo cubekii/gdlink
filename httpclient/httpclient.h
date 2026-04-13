@@ -20,10 +20,10 @@ namespace httpclient {
     class BoomlingsLevel {
     private:
         std::thread gclient;
+        static std::unordered_map<std::string, std::string> fields;
     public:
-        void start();
-        void fetch();
-
+        void fetch(std::string level_id);
+        std::string get_result(const FieldType& field);
     };
 
 }

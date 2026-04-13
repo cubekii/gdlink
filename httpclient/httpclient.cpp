@@ -84,3 +84,35 @@ std::string httpclient::get_result(const std::string& id, const FieldType& field
     }
     return "-1";
 }
+
+namespace httpclient {
+    void BoomlingsLevel::fetch(std::string levelId) {
+        this->gclient = std::thread([this, levelId]() {
+            httplib::Client cli("www.boomlings.com", 80);
+            cli.set_default_headers({
+            { "User-Agent", "" }
+            });
+
+            cli.set_connection_timeout(10, 0);
+            cli.set_read_timeout(10, 0);
+
+            httplib::Params params = {
+            { "gameVersion", "22"         },
+            { "binaryVersion", "42"       },
+            { "gdw",         "0"          },
+            { "str",         levelId      },
+            { "type",        "19"         },
+            { "secret",      "Wmfd2893gb7"}
+            };
+
+            auto res = cli.Post("/database/getGJLevels21.php", params);
+            if (res && res->status == 200 && res->body != "-1") {
+                this->fields = parseResponse(res->body);
+            }
+        });
+    }
+
+    std::string BoomlingsLevel::get_result(const FieldType &field) {
+        return this->fields[std::to_string(field)];
+    }
+}
