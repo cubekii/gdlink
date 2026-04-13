@@ -52,3 +52,14 @@ jobs:
           name: geode-mod-windows
           path: build/*.geode
           if-no-files-found: warn
+
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $geodeFiles = Get-ChildItem -Path build -Filter *.geode
+          foreach ($file in $geodeFiles) {
+            gh release upload $env:GITHUB_REF_NAME $file.FullName --clobber
+          }
+        shell: pwsh
