@@ -5,6 +5,7 @@
 #include <Geode/loader/Dirs.hpp>
 #include <url.h>
 #include "httpserv/httpserv.h"
+#include "httpclient/httpclient.h"
 
 using namespace geode::prelude;
 
@@ -15,6 +16,11 @@ class $modify(LoadingLayer) {
 		if (m_loadStep >= 14) {
 			httpserv::startserver();
 			CustomUrl::Redirect( CustomUrl::GetLink() );
+			
+			httpclient::fetch("28225110", httpclient::FieldType::LevelName, [](const std::string& result) {
+				// Handle result here when the fetch completes
+				Notification::create(result)->show();
+			});
 		}
 	}
 };
