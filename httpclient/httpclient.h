@@ -2,7 +2,7 @@
 
 #include <httplib.h>
 #include <string>
-#include <functional>
+#include <unordered_map>
 
 namespace httpclient {
     enum FieldType {
@@ -12,8 +12,8 @@ namespace httpclient {
     };
 
     using http_headers = std::unordered_map<std::string, std::string>;
-    using FetchCallback = std::function<void(const std::string& result)>;
 
     http_headers parseResponse(const std::string& body);
-    void fetch(const std::string& id, const FieldType& field, FetchCallback callback = nullptr);
+    void fetch(const std::string& id, const FieldType& field);
+    std::string get_result(const std::string& id, const FieldType& field);
 }

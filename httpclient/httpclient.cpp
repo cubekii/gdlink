@@ -2,6 +2,15 @@
 #include <httplib.h>
 #include <Geode/Geode.hpp>
 #include <thread>
+#include <mutex>
+#include <unordered_map>
+
+static std::mutex g_results_mutex;
+static std::unordered_map<std::string, std::string> g_results;
+
+static std::string make_key(const std::string& id, const httpclient::FieldType& field) {
+    return id + "_" + std::to_string(static_cast<int>(field));
+}
 
 httpclient::http_headers httpclient::parseResponse(const std::string& body) {
     std::string levelSection = body.substr(0, body.find('#'));
@@ -18,8 +27,8 @@ httpclient::http_headers httpclient::parseResponse(const std::string& body) {
     return fields;
 }
 
-void httpclient::fetch(const std::string& levelId, const FieldType& field, FetchCallback callback) {
-    std::thread([levelId, field, callback]() {
+void httpclient::fetch(const std::string& levelId, const FieldType& field) {
+    std::thread([levelId, field]() {
         try {
             httplib::Client cli("www.boomlings.com", 80);
 
@@ -57,18 +66,21 @@ void httpclient::fetch(const std::string& levelId, const FieldType& field, Fetch
                 }
             }
 
-            if (callback) {
-                geode::queueInMainThread([callback, result]() {
-                    callback(result);
-                });
-            }
+            std::lock_guard<std::mutex> lock(g_results_mutex);
+            g_results[make_key(levelId, field)] = result;
         } catch (const std::exception& e) {
-            //geode::log::error("HTTP fetch failed: {}", e.what());
-            if (callback) {
-                geode::queueInMainThread([callback]() {
-                    callback("-1");
-                });
-            }
+            geode::log::error("HTTP fetch failed: {}", e.what());
+            std::lock_guard<std::mutex> lock(g_results_mutex);
+            g_results[make_key(levelId, field)] = "-1";
         }
     }).detach();
+}
+
+std::string httpclient::get_result(const std::string& id, const FieldType& field) {
+    std::lock_guard<std::mutex> lock(g_results_mutex);
+    auto it = g_results.find(make_key(id, field));
+    if (it != g_results.end()) {
+        return it->second;
+    }
+    return "-1";
 }
