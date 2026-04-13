@@ -13,6 +13,7 @@ on:
 
 jobs:
   build:
+    if: !startsWith(github.ref, 'refs/tags/v')
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +34,6 @@ jobs:
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
-    if: !startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - uses: actions/checkout@v4
