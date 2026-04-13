@@ -13,9 +13,12 @@ void gdloader::searchtab(const gd::string& searchQuery) {
 
 void gdloader::loadlevel(const int& levelID) {
     auto level = GJOnlineGameLevel::createWithLevelID(levelID);
-
-    auto scene = LevelInfoLayer::scene(level, false);
-    CCDirector::sharedDirector()->pushScene(
-        CCTransitionFade::create(0.5f, scene)
-    );
+    if (level) {
+        auto scene = LevelInfoLayer::scene(level, false);
+        CCDirector::sharedDirector()->pushScene(
+            CCTransitionFade::create(0.5f, scene)
+        );
+    } else {
+        geode::prelude::Notification::create("Error loading level")->show();
+    }
 }

@@ -12,7 +12,7 @@ GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
 
     level->m_levelID = id;
     while (!Fetchlevel.is_ready()) {}
-    if (level->init()) {
+    if (level->init() && Fetchlevel.get_result(httpclient::FieldType::LevelName)!="-1") {
         level->m_levelID = id;
         level->autorelease();
         level->m_levelName = Fetchlevel.get_result(httpclient::FieldType::LevelName);
