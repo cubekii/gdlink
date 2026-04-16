@@ -4,55 +4,49 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include "../../src/openurl/searchtab.h"
 
-CustomUrl::CustomUrl(const std::string& scheme) {
-    std::string baseKey = "SOFTWARE\\Classes\\" + scheme;
+CustomUrl::CustomUrl(const std::string& scheme) : custom_url(scheme) {
+    const std::string baseKey = "SOFTWARE\\Classes\\" + custom_url;
+    const std::string cmdKey  = baseKey + "\\shell\\open\\command";
 
-    // Create root key
-    HKEY hKey;
-    RegCreateKeyExA(HKEY_CURRENT_USER, baseKey.c_str(), 0, NULL,
-        REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
+    auto writeKeys = [&](const std::string& keyPath, auto&& fn) -> bool {
+        HKEY hKey = nullptr;
+        if (RegCreateKeyExA(HKEY_CURRENT_USER, keyPath.c_str(), 0, nullptr,
+                REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr) != ERROR_SUCCESS)
+            return false;
 
-    const char* desc = "URL:MyApp Protocol";
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)desc, strlen(desc) + 1);
+        fn(hKey);
+        RegCloseKey(hKey);
+        return true;
+    };
 
-    const char* urlProto = "";
-    RegSetValueExA(hKey, "URL Protocol", 0, REG_SZ, (BYTE*)urlProto, 1);
-    RegCloseKey(hKey);
+    writeKeys(baseKey, [](HKEY hKey) {
+        static constexpr char desc[]    = "Custom geometry dash links";
+        static constexpr char proto[]   = "";
 
-    // Set the command to execute curl with the URL as POST body
-    std::string cmdKey = baseKey + "\\shell\\open\\command";
-    RegCreateKeyExA(HKEY_CURRENT_USER, cmdKey.c_str(), 0, NULL,
-        REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
+        RegSetValueExA(hKey, nullptr, 0, REG_SZ, (const BYTE*)desc,  sizeof(desc));
+        RegSetValueExA(hKey, "GDLink Protocol", 0, REG_SZ, (const BYTE*)proto, sizeof(proto));
+    });
 
-    // curl.exe -X POST http://localhost:6767/api/echo -d "%1"
-    // %1 will be substituted with the full gdlink:// URL by Windows
-    std::string cmd = "curl.exe -X POST http://localhost:6767/api/echo -d \"%1\"";
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)cmd.c_str(), cmd.size() + 1);
-    RegCloseKey(hKey);
+    writeKeys(cmdKey, [](HKEY hKey) {
+        static constexpr char cmd[] = "curl.exe -X POST http://localhost:6767/api/echo -d \"%1\"";
+        RegSetValueExA(hKey, nullptr, 0, REG_SZ, (const BYTE*)cmd, sizeof(cmd));
+    });
 }
 CustomUrl::~CustomUrl() {}
 
-void CustomUrl::sendNotification(const char* title, const char* text) {
-
-}
-
 std::string CustomUrl::GetLink() {
+    const std::string_view cmdLine = GetCommandLineA();
+    const size_t pos = cmdLine.find("gdlink://");
 
-    std::optional<std::string> pendingUrl = std::nullopt;
-    std::string cmdLine = GetCommandLineA();
+    if (pos == std::string_view::npos)
+        return "";
 
-    size_t pos = cmdLine.find("gdlink://");
-    if (pos != std::string::npos) {
-        pendingUrl = cmdLine.substr(pos);
+    std::string result(cmdLine.substr(pos));
 
-        if (!pendingUrl->empty() && pendingUrl->back() == '"')
-            pendingUrl->pop_back();
-    }
+    if (!result.empty() && result.back() == '"')
+        result.pop_back();
 
-    if (pendingUrl.has_value()) {
-        return *pendingUrl;
-    }
-    return "";
+    return result;
 }
 
 void CustomUrl::Redirect(const std::string& url) {
@@ -78,7 +72,6 @@ void CustomUrl::Redirect(const std::string& url) {
 
     view = view.substr(LEVEL_ACTION.size());
 
-    // Parse ID without exceptions
     int id = 0;
     for (char c : view) {
         if (c < '0' || c > '9') {

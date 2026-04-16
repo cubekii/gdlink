@@ -3,33 +3,24 @@
 #include <url.h>
 #include <thread>
 #include <atomic>
-
-#include "../src/openurl/searchtab.h"
+#include "src/openurl/searchtab.h"
 
 static std::atomic<bool> g_running{false};
 static std::thread g_server_thread;
 
 void httpserv::startserver() {
     CustomUrl gdlink("gdlink");
-    if (g_running.exchange(true)) {
-        return; // already running
-    }
+
+    if (g_running.exchange(true))
+        return;
 
     g_server_thread = std::thread([]() {
         httplib::Server svr;
 
-        svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
-            res.set_content("Hello, World!", "text/plain");
-        });
-
-        svr.Get("/api/data", [](const httplib::Request& req, httplib::Response& res) {
-            res.set_content("{\"status\": \"ok\"}", "application/json");
-        });
-
         svr.Post("/api/echo", [](const httplib::Request& req, httplib::Response& res) {
             std::string received = req.body; // "Hello"
             geode::queueInMainThread([received]() mutable {
-            CustomUrl::Redirect( received );
+                CustomUrl::Redirect( received );
             });
             res.set_content(received, "text/plain");
         });
