@@ -133,5 +133,22 @@ namespace httpclient {
         std::lock_guard<std::mutex> lock(this->fields_mutex);
         return author_name.empty() ? "-1" : author_name;
     }
+    std::string BoomlingsLevel::get_song_id() const {
+        std::lock_guard<std::mutex> lock(this->fields_mutex);
 
-} // namespace httpclient
+        // Field 35 = custom/Newgrounds song ID (non-zero means a custom song)
+        auto custom_it = this->fields.find("35");
+        if (custom_it != this->fields.end() && !custom_it->second.empty()
+            && custom_it->second != "0") {
+            return custom_it->second;
+            }
+
+        // Field 12 = official in-game song index (0–21 etc.)
+        auto official_it = this->fields.find("12");
+        if (official_it != this->fields.end() && !official_it->second.empty()) {
+            return official_it->second;
+        }
+
+        return "-1";
+    }
+}

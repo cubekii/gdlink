@@ -14,6 +14,7 @@ namespace httpclient {
         LevelName = 2,
         LevelDescription = 3,
         LevelAuthorID = 6,  // userID inside level data, to match against creator
+        LevelSongID, // use this enum
     };
 
     using http_headers = std::unordered_map<std::string, std::string>;
@@ -43,6 +44,7 @@ namespace httpclient {
         bool is_ready() const;
         std::string get_result(const FieldType& field) const;
         std::string get_author() const;
+        std::string get_song_id() const;   // ADD THIS
     };
 
 } // namespace httpclient

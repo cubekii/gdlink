@@ -17,6 +17,7 @@ GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
         level->autorelease();
         level->m_levelName = Fetchlevel.get_result(httpclient::FieldType::LevelName);
         level->m_creatorName = Fetchlevel.get_author();
+        level->m_songID = std::stoi(Fetchlevel.get_song_id());
         if (Fetchlevel.get_author()!="-1") //strange way to verify account :)
             level->m_accountID = 1;
         return level;
