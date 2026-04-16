@@ -4,7 +4,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include "../../src/openurl/searchtab.h"
 
-CustomUrl::CustomUrl(const std::string& scheme) : custom_url(scheme) {
+CustomUrl::CustomUrl() {
     const std::string baseKey = "SOFTWARE\\Classes\\" + custom_url;
     const std::string cmdKey  = baseKey + "\\shell\\open\\command";
 
@@ -28,11 +28,10 @@ CustomUrl::CustomUrl(const std::string& scheme) : custom_url(scheme) {
     });
 
     writeKeys(cmdKey, [](HKEY hKey) {
-        static constexpr char cmd[] = "curl.exe -X POST http://localhost:6767/api/echo -d \"%1\"";
+        static constexpr char cmd[] = "curl.exe -X POST http://localhost:6767/api/loadurl -d \"%1\"";
         RegSetValueExA(hKey, nullptr, 0, REG_SZ, (const BYTE*)cmd, sizeof(cmd));
     });
 }
-CustomUrl::~CustomUrl() {}
 
 std::string CustomUrl::GetLink() {
     const std::string_view cmdLine = GetCommandLineA();
@@ -47,40 +46,4 @@ std::string CustomUrl::GetLink() {
         result.pop_back();
 
     return result;
-}
-
-void CustomUrl::Redirect(const std::string& url) {
-    static constexpr std::string_view SCHEME = "gdlink://GD/";
-    static constexpr std::string_view LEVEL_ACTION = "level/";
-
-    if (url.size() <= SCHEME.size()) return;
-
-    std::string_view view(url);
-
-    if (view.substr(0, SCHEME.size()) != SCHEME) {
-        std::cout << "Invalid scheme\n";
-        return;
-    }
-
-    view = view.substr(SCHEME.size());
-
-    // Strip query string
-    if (auto q = view.find('?'); q != std::string_view::npos)
-        view = view.substr(0, q);
-
-    if (view.substr(0, LEVEL_ACTION.size()) != LEVEL_ACTION) return;
-
-    view = view.substr(LEVEL_ACTION.size());
-
-    int id = 0;
-    for (char c : view) {
-        if (c < '0' || c > '9') {
-            geode::prelude::log::warn("wrong id");
-            return;
-        }
-        id = id * 10 + (c - '0');
-    }
-
-    if (!view.empty())
-        gdloader::loadlevel(id);
 }

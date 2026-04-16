@@ -9,22 +9,18 @@ static std::atomic<bool> g_running{false};
 static std::thread g_server_thread;
 
 void httpserv::startserver() {
-    CustomUrl gdlink("gdlink");
-
     if (g_running.exchange(true))
         return;
 
     g_server_thread = std::thread([]() {
         httplib::Server svr;
 
-        svr.Post("/api/echo", [](const httplib::Request& req, httplib::Response& res) {
-            std::string received = req.body; // "Hello"
+        svr.Post("/api/loadurl", [](const httplib::Request& req, httplib::Response& res) {
+            std::string received = req.body;
             geode::queueInMainThread([received]() mutable {
-                CustomUrl::Redirect( received );
             });
             res.set_content(received, "text/plain");
         });
-
         svr.listen("127.0.0.1", 6767);
         g_running = false;
     });

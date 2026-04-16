@@ -15,7 +15,6 @@ class $modify(LoadingLayer) {
 
 		if (m_loadStep >= 14) {
 			httpserv::startserver();
-			CustomUrl::Redirect( CustomUrl::GetLink() );
 		}
 	}
 };
