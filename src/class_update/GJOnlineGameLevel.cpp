@@ -4,11 +4,11 @@
 #include <thread>
 #include <chrono>
 
-HttpClient fetch_level;
+//HttpClient fetch_level;
 
 GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
     auto level = new GJOnlineGameLevel();
-    //Fetchlevel.fetch(std::to_string(id));
+    //fetch_level.fetch_level(std::to_string(id));
 
     level->m_levelID = id;
     //while (!Fetchlevel.is_ready()) {}

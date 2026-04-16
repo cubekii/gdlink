@@ -3,8 +3,17 @@
 
 HttpClient::HttpClient() {}
 
+HttpClient::~HttpClient() {
+    if (gclient.joinable())
+        gclient.join();
+}
+
 void HttpClient::fetch_level(const std::string &level_id) {
-    this->gclient = std::thread([this, level_id]() {
+
+    if (gclient.joinable())
+        gclient.join();
+
+    gclient = std::thread([this, level_id]() {
         httplib::Client cli(this->host,80);
         cli.set_default_headers({ { "User-Agent", "" } });
         cli.set_connection_timeout(10, 0);
@@ -18,16 +27,20 @@ void HttpClient::fetch_level(const std::string &level_id) {
             { "type",          "19"          },
             { "secret",        "Wmfd2893gb7" }
         };
-        std::lock_guard<std::mutex> lock(glock);
-        this->fields = cli.Post("/database/getGJLevels21.php", params)->body;
+        auto res = cli.Post("/database/getGJLevels21.php", params);
+        if (res && res->status == 200) {
+            std::lock_guard<std::mutex> lock(glock);
+            fields = res->body;
+        }
+
+        ready.store(true);
     });
 }
 
-ParsedResponse HttpClient::parseResponse() {
-        ParsedResponse result;
+void HttpClient::parseResponse() {
 
         std::vector<std::string> sections;
-        std::istringstream section_stream(this->fields);
+        std::istringstream section_stream(fields);
         std::string section;
         while (std::getline(section_stream, section, '#')) {
             sections.push_back(section);
@@ -39,14 +52,14 @@ ParsedResponse HttpClient::parseResponse() {
             std::istringstream stream(firstLevel);
             std::string key, value;
             while (std::getline(stream, key, ':') && std::getline(stream, value, ':')) {
-                result.level_fields[key] = value;
+                lvl.level_fields[key] = value;
             }
         }
 
         if (sections.size() > 1 && !sections[1].empty()) {
             std::string level_user_id = "";
-            auto it = result.level_fields.find("6");
-            if (it != result.level_fields.end()) {
+            auto it = lvl.level_fields.find("6");
+            if (it != lvl.level_fields.end()) {
                 level_user_id = it->second;
             }
 
@@ -62,12 +75,18 @@ ParsedResponse HttpClient::parseResponse() {
 
                 if (parts.size() >= 2) {
                     if (level_user_id.empty() || parts[0] == level_user_id) {
-                        result.author_name = parts[1];
+                        lvl.author_name = parts[1];
                         break;
                     }
                 }
             }
         }
+}
 
-    return result;
+std::string HttpClient::get_creator() {
+    return lvl.author_name;
+}
+
+std::string HttpClient::get_level_name() {
+    return lvl.level_fields["1"];
 }

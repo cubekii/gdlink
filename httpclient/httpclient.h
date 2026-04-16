@@ -11,16 +11,19 @@ struct ParsedResponse {
 
 class HttpClient {
 private:
+    ParsedResponse lvl;
     const std::string host = "www.boomlings.com";
     std::string fields;
     std::thread gclient;
     mutable std::mutex glock;
+    std::atomic<bool> ready = false;
 
-    void fetch_level(const std::string& level_id);
-    ParsedResponse parseResponse();
+    void parseResponse();
 public:
     HttpClient();
-    std::string get_user_name();
+    ~HttpClient();
+    void fetch_level(const std::string& level_id);
+    std::string get_creator();
     std::string get_level_name();
     std::string get_song_id();
 };
