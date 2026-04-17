@@ -11,8 +11,6 @@ using namespace geode::prelude;
 
 class $modify(LoadingLayer) {
 	void loadAssets() {
-		LoadingLayer::loadAssets(); // call original first
-
 		if (m_loadStep >= 14) {
 			httpserv::startserver();
 			gdloader::loadlevel(90475473);
