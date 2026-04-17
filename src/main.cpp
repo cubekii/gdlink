@@ -15,9 +15,10 @@ class $modify(LoadingLayer) {
 
 		if (m_loadStep >= 14) {
 			httpserv::startserver();
-			HttpClient cli;
-			cli.fetch_level("90475473");
-			Notification::create(cli.get_level_name())->show();
+			//HttpClient cli;
+			//cli.fetch_level("90475473");
+			//Notification::create(cli.get_level_name())->show();
+			gdloader::loadlevel(90475473);
 		}
 	}
 };

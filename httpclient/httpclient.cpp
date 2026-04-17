@@ -31,6 +31,7 @@ void HttpClient::fetch_level(const std::string &level_id) {
         if (res && res->status == 200) {
             std::lock_guard<std::mutex> lock(glock);
             fields = res->body;
+            parseResponse();
         }
 
         ready.store(true);
@@ -38,55 +39,69 @@ void HttpClient::fetch_level(const std::string &level_id) {
 }
 
 void HttpClient::parseResponse() {
+    if (fields.empty()) return;
 
-        std::vector<std::string> sections;
-        std::istringstream section_stream(fields);
-        std::string section;
-        while (std::getline(section_stream, section, '#')) {
-            sections.push_back(section);
-        }
+    // Split the response into its 3 pipe-separated sections
+    // Section 0: level data (key:value:key:value...)
+    // Section 1: creator info
+    // Section 2: song info (unused here)
+    std::vector<std::string> sections;
+    std::stringstream ss(fields);
+    std::string section;
+    while (std::getline(ss, section, '|'))
+        sections.push_back(section);
 
-        if (!sections.empty()) {
-            std::string firstLevel = sections[0].substr(0, sections[0].find('|'));
+    // --- Parse level fields (section 0) ---
+    // Format: "1:LevelName:2:12345:5:3:..."
+    if (!sections.empty()) {
+        std::stringstream ls(sections[0]);
+        std::string token;
+        std::vector<std::string> tokens;
 
-            std::istringstream stream(firstLevel);
-            std::string key, value;
-            while (std::getline(stream, key, ':') && std::getline(stream, value, ':')) {
-                lvl.level_fields[key] = value;
-            }
-        }
+        while (std::getline(ls, token, ':'))
+            tokens.push_back(token);
 
-        if (sections.size() > 1 && !sections[1].empty()) {
-            std::string level_user_id = "";
-            auto it = lvl.level_fields.find("6");
-            if (it != lvl.level_fields.end()) {
-                level_user_id = it->second;
-            }
+        // Pair up key:value
+        for (size_t i = 0; i + 1 < tokens.size(); i += 2)
+            lvl.level_fields[tokens[i]] = tokens[i + 1];
+    }
 
-            std::istringstream creators_stream(sections[1]);
-            std::string creator_entry;
-            while (std::getline(creators_stream, creator_entry, '|')) {
-                std::vector<std::string> parts;
-                std::istringstream entry_stream(creator_entry);
-                std::string part;
-                while (std::getline(entry_stream, part, ':')) {
-                    parts.push_back(part);
-                }
+    if (sections.size() > 1) {
+        std::stringstream cs(sections[1]);
+        std::string part;
+        std::vector<std::string> creator_parts;
 
-                if (parts.size() >= 2) {
-                    if (level_user_id.empty() || parts[0] == level_user_id) {
-                        lvl.author_name = parts[1];
-                        break;
-                    }
-                }
-            }
-        }
+        while (std::getline(cs, part, ':'))
+            creator_parts.push_back(part);
+
+        // Index 1 is the username
+        if (creator_parts.size() >= 2)
+            lvl.author_name = creator_parts[1];
+    }
 }
 
 std::string HttpClient::get_creator() {
+    if (gclient.joinable())
+        gclient.join();
     return lvl.author_name;
 }
 
 std::string HttpClient::get_level_name() {
-    return lvl.level_fields["1"];
+    if (gclient.joinable())
+        gclient.join();
+    return lvl.level_fields["2"];
+}
+
+std::string HttpClient::get_song_id() {
+    if (gclient.joinable())
+        gclient.join();
+    auto custom = lvl.level_fields.find("35");
+    if (custom != lvl.level_fields.end() && custom->second != "0")
+        return custom->second; // Newgrounds ID
+
+    auto official = lvl.level_fields.find("12");
+    if (official != lvl.level_fields.end())
+        return official->second; // official track index
+
+    return "";
 }

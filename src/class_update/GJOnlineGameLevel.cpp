@@ -4,14 +4,13 @@
 #include <thread>
 #include <chrono>
 
-//HttpClient fetch_level;
 
 GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
     auto level = new GJOnlineGameLevel();
-    //fetch_level.fetch_level(std::to_string(id));
+    HttpClient fetch_level;
+    fetch_level.fetch_level(std::to_string(id));
 
     level->m_levelID = id;
-    //while (!Fetchlevel.is_ready()) {}
     if (level->init()) {
         level->m_levelID = id;
         level->autorelease();
@@ -22,6 +21,9 @@ GJOnlineGameLevel* GJOnlineGameLevel::createWithLevelID(const int& id) {
         if (Fetchlevel.get_author()!="-1") //strange way to verify account :)
             level->m_accountID = 1;
         */
+        level->m_levelName = fetch_level.get_level_name();
+        level->m_creatorName = fetch_level.get_creator();
+        level->m_songID = std::stoi(fetch_level.get_song_id());
         return level;
     }
     CC_SAFE_DELETE(level);
