@@ -37,22 +37,17 @@ void HttpClient::fetch_level(const std::string &level_id) {
         ready.store(true);
     });
 }
-
 void HttpClient::parseResponse() {
     if (fields.empty()) return;
 
-    // Split the response into its 3 pipe-separated sections
-    // Section 0: level data (key:value:key:value...)
-    // Section 1: creator info
-    // Section 2: song info (unused here)
+    // Split by '#' not '|'
     std::vector<std::string> sections;
     std::stringstream ss(fields);
     std::string section;
-    while (std::getline(ss, section, '|'))
+    while (std::getline(ss, section, '#'))
         sections.push_back(section);
 
     // --- Parse level fields (section 0) ---
-    // Format: "1:LevelName:2:12345:5:3:..."
     if (!sections.empty()) {
         std::stringstream ls(sections[0]);
         std::string token;
@@ -61,11 +56,12 @@ void HttpClient::parseResponse() {
         while (std::getline(ls, token, ':'))
             tokens.push_back(token);
 
-        // Pair up key:value
         for (size_t i = 0; i + 1 < tokens.size(); i += 2)
             lvl.level_fields[tokens[i]] = tokens[i + 1];
     }
 
+    // --- Parse creator (section 1) ---
+    // Format: "userID:username:accountID"
     if (sections.size() > 1) {
         std::stringstream cs(sections[1]);
         std::string part;
@@ -74,9 +70,8 @@ void HttpClient::parseResponse() {
         while (std::getline(cs, part, ':'))
             creator_parts.push_back(part);
 
-        // Index 1 is the username
         if (creator_parts.size() >= 2)
-            lvl.author_name = creator_parts[1];
+            lvl.author_name = creator_parts[1]; // index 1 is username
     }
 }
 
@@ -95,13 +90,5 @@ std::string HttpClient::get_level_name() {
 std::string HttpClient::get_song_id() {
     if (gclient.joinable())
         gclient.join();
-    auto custom = lvl.level_fields.find("35");
-    if (custom != lvl.level_fields.end() && custom->second != "0")
-        return custom->second; // Newgrounds ID
-
-    auto official = lvl.level_fields.find("12");
-    if (official != lvl.level_fields.end())
-        return official->second; // official track index
-
-    return "";
+    return (lvl.level_fields["35"]!="0" ? lvl.level_fields["35"] : lvl.level_fields["12"]);
 }
