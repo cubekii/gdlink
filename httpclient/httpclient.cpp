@@ -92,3 +92,9 @@ std::string HttpClient::get_song_id() {
         gclient.join();
     return (lvl.level_fields["35"]!="0" ? lvl.level_fields["35"] : lvl.level_fields["12"]);
 }
+
+bool HttpClient::is_creator_known() {
+    if (gclient.joinable())
+        gclient.join();
+    return get_creator()!="";
+}

@@ -26,4 +26,5 @@ public:
     std::string get_creator();
     std::string get_level_name();
     std::string get_song_id();
+    bool is_creator_known();
 };

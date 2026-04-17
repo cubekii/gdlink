@@ -17,9 +17,9 @@ void httpserv::startserver() {
 
         svr.Post("/api/loadurl", [](const httplib::Request& req, httplib::Response& res) {
             std::string received = req.body;
-            geode::queueInMainThread([received]() mutable {
-            });
+
             res.set_content(received, "text/plain");
+            return "";
         });
         svr.listen("127.0.0.1", 6767);
         g_running = false;
